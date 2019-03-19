@@ -1,0 +1,58 @@
+clear
+close all,
+clc;
+pic=imread('C:\Users\Dell\Desktop\forth assignment\test4 copy.bmp');
+
+pic=double(pic);
+unsharp=pic;
+sobel=pic;
+Laplace=pic;
+Canny =pic;
+m=size(pic,1);
+n=size(pic,2);
+
+%À©Õ¹Í¼Ïñ
+pickuo=[pic(1,1),pic(1,:),pic(1,n);pic(:,1),pic,pic(:,n);pic(m,1),pic(m,:),pic(m,n)];
+
+%unsharp marking
+for i=1:m
+    for j=1:n
+        unsharp(i,j)=pickuo(i+1,j+1)-0.7*(pickuo(i,j)+pickuo(i,j+1)+...
+            pickuo(i+1,j)+pickuo(i+1,j+2)+pickuo(i+2,j+1)+pickuo(i+2,j+2)+...
+            pickuo(i+2,j)+pickuo(i,j+2)-8*pickuo(i+1,j+1));
+    end
+end
+unsharp=uint8(unsharp);
+subplot(2,2,1)
+imshow(unsharp)
+title('·ÇÈñ»¯ÑÚÄ¤')
+
+%Sobel edge detector
+gx=[-1,0,1;-2,0,2;-1,0,1];
+gy=[1,2,1;0,0,0;-1,-2,-1];
+sobx=conv2(pic,gx,'same');
+soby=conv2(pic,gy,'same');
+for i=1:m
+    for j=1:n
+        sobel(i,j)=abs(sobx(i,j))+abs(soby(i,j));
+    end
+end
+soble=uint8(sobel);
+subplot(2,2,2)
+imshow(soble)
+title('Sobel±ßÔµ¼ì²â')
+
+%Laplace edge detection
+la=[1,1,1;1,-8,1;1,1,1];
+Laplace=conv2(pic,la,'same');
+Laplace=uint8(Laplace);
+subplot(2,2,3)
+imshow(Laplace)
+title('Laplace±ßÔµ¼ì²â')
+
+%Canny algorithm
+pic=uint8(pic);
+Canny=edge(pic,'canny');
+subplot(2,2,4)
+imshow(Canny)
+title('Canny Ëã·¨')

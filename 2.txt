@@ -1,0 +1,102 @@
+clear
+close all,
+clc;
+[pic,map]=imread('C:\Users\Dell\Desktop\forth assignment\test2.tif');
+huidu=imhist(pic);
+pic=double(pic);
+newpic=pic;
+sum3=0;
+sum5=0;sum7=0;
+m=size(pic,1);
+n=size(pic,2);
+
+%扩展图像
+a=zeros(3,3);
+b=a;
+c=a;
+d=a;
+a=a+pic(1,1);
+b=b+pic(1,n);
+c=c+pic(m,1);
+d=d+pic(m,n);
+e=[pic(1,:);pic(1,:);pic(1,:)];
+f=[pic(:,1),pic(:,1),pic(:,1)];
+g=[pic(m,:);pic(m,:);pic(m,:)];
+h=[pic(:,n),pic(:,n),pic(:,n)];
+pickuo=[a,e,b;f,pic,h;c,g,d];
+
+%求高斯滤波系数 3*3
+con3=zeros(3,3);
+center=2;
+len=3;
+fang3=2.25;
+for i=1:len
+    for j=1:len
+        con3(i,j)=exp(-((center-i)^2+(center-j)^2)/2/fang3)/2/pi/fang3;
+        sum3=sum3+con3(i,j);
+    end
+end
+
+%5*5
+con5=zeros(5,5);
+center=3;
+len=5;
+fang5=2.25;
+for i=1:len
+    for j=1:len
+        con5(i,j)=exp(-((center-i)^2+(center-j)^2)/2/fang5)/2/pi/fang5;
+        sum5=sum5+con5(i,j);
+    end
+end
+
+%7*7
+con7=zeros(7,7);
+center=4;
+len=7;
+fang7=2.25;
+for i=1:len
+    for j=1:len
+        con7(i,j)=exp(-((center-i)^2+(center-j)^2)/2/fang7)/2/pi/fang7;
+        sum7=sum7+con7(i,j);
+    end
+end
+
+%高斯3*3
+pic3g=zeros(m,n);
+pic5g=zeros(m,n);
+pic7g=zeros(m,n);
+for i=1:m
+    for j=1:n
+        for k=1:3
+            for p=1:3
+                pic3g(i,j)=pic3g(i,j)+pickuo(i+k+1,j+p+1)*con3(k,p);
+            end
+        end
+        pic3g(i,j)=pic3g(i,j)/sum3;
+        for k=1:5
+            for p=1:5
+                pic5g(i,j)=pic5g(i,j)+pickuo(i+k,j+p)*con5(k,p);
+            end
+        end
+        pic5g(i,j)=pic5g(i,j)/sum5;
+        for k=1:7
+            for p=1:7
+                pic7g(i,j)=pic7g(i,j)+pickuo(i+k-1,j+p-1)*con7(k,p);
+            end
+        end
+        pic7g(i,j)=pic7g(i,j)/sum7;
+    end
+end
+pic3g=uint8(pic3g);
+pic5g=uint8(pic5g);
+pic7g=uint8(pic7g);
+
+subplot(1,3,1)
+imshow(pic3g)
+title('3*3高斯滤波')
+subplot(1,3,2)
+imshow(pic5g)
+title('5*5高斯滤波')
+subplot(1,3,3)
+imshow(pic7g)
+title('7*7高斯滤波')
